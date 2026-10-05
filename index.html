@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behavioral & Psychological Diagnostic</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: var(--border-color);
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-title {
+            font-size: 1.15rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background-color: rgba(31, 41, 55, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .option-card:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .option-card.selected {
+            border-color: var(--accent-color);
+            background-color: rgba(59, 130, 246, 0.15);
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Results / Landing Page Styles */
+        .results-header {
+            margin-bottom: 20px;
+        }
+
+        .teaser-box {
+            background-color: rgba(31, 41, 55, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .teaser-box h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .teaser-list {
+            list-style-type: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .teaser-list li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .teaser-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .terminal-stream {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- INTRO SCREEN -->
+        <div id="intro-screen">
+            <h1>Behavioral Diagnostic</h1>
+            <p>Most personality assessments keep you on the surface. This diagnostic analyzes structural friction, stress responses, and subconscious psychological drivers. It takes 10 to 15 minutes. Answer based on raw instinct, not aspiration.</p>
+            <button class="btn" onclick="startAssessment()">Begin Diagnostic</button>
+        </div>
+
+        <!-- ASSESSMENT SCREEN -->
+        <div id="assessment-screen" class="hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div id="question-container">
+                <!-- Dynamically injected questions -->
+            </div>
+            <button class="btn" id="next-btn" onclick="handleNext()" disabled>Continue</button>
+        </div>
+
+        <!-- PROCESSING SCREEN -->
+        <div id="processing-screen" class="hidden">
+            <h1>Synthesizing Data...</h1>
+            <p>Removing public persona masks and parsing core behavioral vectors.</p>
+            <div class="terminal-stream" id="terminal-log">
+                [SYSTEM] Parsing stress-response profiles...
+            </div>
+        </div>
+
+        <!-- ENDING LANDING PAGE SCREEN -->
+        <div id="landing-screen" class="hidden">
+            <div class="results-header">
+                <h1>Your Psychological Profile Is Ready.</h1>
+                <p>The data has been parsed past your surface-level habits. Below is your core behavioral baseline—and the subconscious friction points governing your output under high pressure.</p>
+            </div>
+
+            <div class="teaser-box">
+                <h3>What the Data Reveals</h3>
+                <ul class="teaser-list">
+                    <li><strong>The Core Driver:</strong> The primary psychological anchor dictating 80% of your operational decisions.</li>
+                    <li><strong>The Stress Vulnerability:</strong> Your unconscious defense mechanism under compressed timelines.</li>
+                    <li><strong>The Friction Point:</strong> Where your natural cognitive pacing clashes with operational environments.</li>
+                </ul>
+            </div>
+
+            <div class="teaser-box" style="border-color: var(--accent-color);">
+                <h3>Unlock Your Full 24-Page Blueprint</h3>
+                <p style="margin-bottom: 16px; font-size: 0.85rem;">Includes complete shadow behavior mapping, systemic vulnerability audits, and tailored integration strategies.</p>
+                <button class="btn" onclick="alert('Redirecting to secure report delivery portal...')">Send My Complete Blueprint</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                title: "Section 1: When faced with high resistance or an unexpected roadblock, your immediate default is to:",
+                options: [
+                    { text: "Take immediate, unilateral control and force a path forward.", type: "D" },
+                    { text: "Rally people, shift narrative framing, and push through collaboratively.", type: "I" },
+                    { text: "Maintain steady routines and resist abrupt, chaotic adjustments.", type: "S" },
+                    { text: "Analyze systemic metrics and audit where the failure point originated.", type: "C" }
+                ]
+            },
+            {
+                title: "Section 2: When entering a high-stakes environment where you must persuade a skeptical audience, your primary lever is:",
+                options: [
+                    { text: "Sheer force of will, direct accountability, and clear dominance.", type: "D" },
+                    { text: "Charisma, energetic narrative framing, and emotional resonance.", type: "I" },
+                    { text: "Quiet consistency and building deep trust through reliability.", type: "S" },
+                    { text: "Pure logic, empirical data, and undeniable proof.", type: "C" }
+                ]
+            },
+            {
+                title: "Section 3: Sudden, unannounced changes to your project scope or environment trigger which internal reaction?",
+                options: [
+                    { text: "Immediate frustration; you prefer predictable operational control.", type: "D" },
+                    { text: "Energized curiosity; you hunt for fresh leverage points.", type: "I" },
+                    { text: "A desire to stabilize the team so everyone stays grounded.", type: "S" },
+                    { text: "Internal calculation; you evaluate the updated risk matrix first.", type: "C" }
+                ]
+            },
+            {
+                title: "Section 4: When you make a critical error, your internal defense mechanism is to:",
+                options: [
+                    { text: "Rationalize external variables and refocus on the next forward action.", type: "D" },
+                    { text: "Pivot quickly and manage external perceptions.", type: "I" },
+                    { text: "Internalize the failure heavily, questioning your baseline competence.", type: "S" },
+                    { text: "Isolate, audit your own process, and obsess over ensuring it never repeats.", type: "C" }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedOptionType = null;
+        let scores = { D: 0, I: 0, S: 0, C: 0 };
+
+        function startAssessment() {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('assessment-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            selectedOptionType = null;
+            document.getElementById('next-btn').disabled = true;
+            
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+
+            const q = questions[currentQuestionIndex];
+            let html = `<div class="question-title">${q.title}</div><div class="options-list">`;
+            
+            q.options.forEach((opt, idx) => {
+                html += `<div class="option-card" onclick="selectOption(this, '${opt.type}')">${opt.text}</div>`;
+            });
+            html += `</div>`;
+
+            document.getElementById('question-container').innerHTML = html;
+        }
+
+        function selectOption(element, type) {
+            document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedOptionType = type;
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function handleNext() {
+            if (selectedOptionType) {
+                scores[selectedOptionType]++;
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showProcessing();
+            }
+        }
+
+        function showProcessing() {
+            document.getElementById('assessment-screen').classList.add('hidden');
+            document.getElementById('processing-screen').classList.remove('hidden');
+
+            const logs = [
+                "[SYSTEM] Parsing stress-response profiles...",
+                "[SYSTEM] Isolating primary behavioral vectors...",
+                "[SYSTEM] Compiling core psychological architecture...",
+                "[SYSTEM] Blueprint generation complete."
+            ];
+
+            let logIndex = 0;
+            const logContainer = document.getElementById('terminal-log');
+
+            const interval = setInterval(() => {
+                logIndex++;
+                if (logIndex < logs.length) {
+                    logContainer.innerHTML += `<br>${logs[logIndex]}`;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(showLandingPage, 800);
+                }
+            }, 700);
+        }
+
+        function showLandingPage() {
+            document.getElementById('processing-screen').classList.add('hidden');
+            document.getElementById('landing-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
